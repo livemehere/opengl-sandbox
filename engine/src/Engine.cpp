@@ -10,6 +10,8 @@ bool Engine::Init(int width, int height, const char *title) {
     return false;
   }
 
+  glfwSetErrorCallback(ErrorCallback);
+
   // Apple gives us OpenGL 4.1, even though we ask for 3.3.
   // That's ok - 4.1 is backward compatible with 3.3.
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);

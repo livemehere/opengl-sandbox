@@ -3,6 +3,7 @@ message("engine start ===============================")
 
 file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
   src/*.cpp
+  src/*.c
 )
 
 # own source

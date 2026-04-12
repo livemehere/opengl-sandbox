@@ -1,5 +1,4 @@
 #include "Engine.hpp"
-#include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
 
 Engine::Engine() = default;
@@ -11,6 +10,10 @@ bool Engine::Init(int width, int height, const char *title) {
     return false;
   }
 
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
   window = glfwCreateWindow(width, height, title, NULL, NULL);
   if (!window) {
     spdlog::error("Failed to create GLFW window");
@@ -20,7 +23,12 @@ bool Engine::Init(int width, int height, const char *title) {
 
   glfwMakeContextCurrent(window);
 
-  // TODO: glad for windows
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    spdlog::error("Failed to initialize GLAD");
+    return false;
+  }
+
+  LogHardwareInfo();
 
   spdlog::info("Engine initialized successfully");
   return true;
@@ -46,4 +54,19 @@ void Engine::ShutDown() {
     glfwDestroyWindow(window);
     glfwTerminate();
   }
+}
+
+void Engine::LogHardwareInfo() {
+  auto vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+  auto renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
+  auto version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
+  auto glslVersion =
+      reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+  spdlog::info("-----------------------------------------");
+  spdlog::info("GPU Vendor: {}", vendor);
+  spdlog::info("GPU Renderer: {}", renderer);
+  spdlog::info("OpenGL Version: {}", version);
+  spdlog::info("GLSL Version: {}", glslVersion);
+  spdlog::info("-----------------------------------------");
 }

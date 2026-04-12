@@ -32,6 +32,16 @@ inline std::string GetGLErrorString(GLenum errorCode) {
   return error;
 }
 
+#ifdef __APPLE__
+#define GL_BREAK() __builtin_trap()
+#else
+#define GL_BREAK() __debugbreak()
+#endif
+
+#ifdef NDEBUG
+#define GLCALL(x) x
+#else
+
 #define GLCALL(x)                                                              \
   do {                                                                         \
     while (glGetError() != GL_NO_ERROR)                                        \
@@ -41,5 +51,7 @@ inline std::string GetGLErrorString(GLenum errorCode) {
       std::string errorStr = GetGLErrorString(error);                          \
       spdlog::error("[OpenGL Error] ({}): {} {} at line {}", errorStr, #x,     \
                     __FILE__, __LINE__);                                       \
+      GL_BREAK();                                                              \
     }                                                                          \
   } while (0)
+#endif

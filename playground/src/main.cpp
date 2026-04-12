@@ -1,9 +1,16 @@
 #include "Engine.hpp"
-#include <iostream>
 
 int main() {
 
-  HelloEngine();
+  Engine engine;
+
+  if (!engine.Init(800, 600, "OpenGL Playgorund")) {
+    return -1;
+  };
+
+  engine.Run();
+
+  engine.ShutDown();
 
   return 0;
 }

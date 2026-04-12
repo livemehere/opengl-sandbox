@@ -10,7 +10,10 @@ add_library(engine STATIC ${ENGINE_SOURCES})
 target_include_directories(engine PUBLIC include)
 
 # external
-
+find_package(glfw3 CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+find_package(OpenGL REQUIRED)
+target_link_libraries(engine PUBLIC glfw spdlog::spdlog OpenGL::GL)
 
 message("engine end ===============================")
 

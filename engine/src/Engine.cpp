@@ -22,10 +22,13 @@ bool Engine::Init(int width, int height, const char *title) {
 
   // TODO: glad for windows
 
+  spdlog::info("Engine initialized successfully");
   return true;
 }
 
 void Engine::Run() {
+  spdlog::info("Starting main loop");
+
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -37,6 +40,8 @@ void Engine::Run() {
 }
 
 void Engine::ShutDown() {
+  spdlog::info("Shutting down engine");
+
   if (window) {
     glfwDestroyWindow(window);
     glfwTerminate();

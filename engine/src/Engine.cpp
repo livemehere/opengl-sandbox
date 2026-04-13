@@ -1,4 +1,5 @@
 #include "Engine.hpp"
+#include "Shader.hpp"
 #include <spdlog/spdlog.h>
 
 Engine::Engine() = default;
@@ -40,6 +41,8 @@ bool Engine::Init(int width, int height, const char *title) {
 
 void Engine::Run() {
   spdlog::info("Starting main loop");
+
+  Shader shader("shaders/basic.vs", "shaders/basic.fs");
 
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);

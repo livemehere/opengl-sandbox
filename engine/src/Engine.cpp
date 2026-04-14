@@ -1,4 +1,5 @@
 #include "Engine.hpp"
+#include "Mesh.hpp"
 #include "Shader.hpp"
 #include <spdlog/spdlog.h>
 
@@ -43,21 +44,32 @@ void Engine::Run() {
   spdlog::info("Starting main loop");
 
   Shader shader("../../../shaders/basic.vs", "../../../shaders/basic.fs");
-  // Mesh mesh;
+  Mesh mesh(
+      {
+          -0.5f, 0.5f, 0.0f, // top-left
+          0.5f, 0.5f, 0.0f,  // top-right
+          0.5f, -0.5f, 0.0f, // bottom-right
+          -0.5f, -0.5f, 0.0f // bottom-left
+      },
+      {
+          0, 1, 2, // first triangle
+          2, 3, 0  // second triangle
+      });
 
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     shader.Bind();
-    // mesh.Bind();
-    glfwSwapBuffers(window);
+    mesh.Bind();
+    mesh.Draw();
 
+    glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
   shader.UnBind();
-  // mesh.UnBind();
+  mesh.UnBind();
 }
 
 void Engine::ShutDown() {

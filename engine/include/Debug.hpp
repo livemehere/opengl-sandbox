@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <spdlog/spdlog.h>
 #include <string>
 
 inline std::string GetGLErrorString(GLenum errorCode) {

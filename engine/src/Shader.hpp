@@ -16,4 +16,7 @@ public:
 
   void Bind() const;
   void UnBind() const;
+
+  void SetVec4(const std::string &name, float v1, float v2, float v3,
+               float v4) const;
 };

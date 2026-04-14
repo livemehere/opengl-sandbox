@@ -89,3 +89,12 @@ void Shader::CheckCompileErrors(unsigned int shader, const std::string &type) {
     spdlog::info("{} shader compiled successfully", type);
   }
 }
+void Shader::SetVec4(const std::string &name, float v1, float v2, float v3,
+                     float v4) const {
+  int location = glGetUniformLocation(ID, name.c_str());
+  if (location == -1) {
+    spdlog::warn("Uniform '{}' not found in shader program {}", name, ID);
+  } else {
+    GLCALL(glUniform4f(location, v1, v2, v3, v4));
+  }
+}

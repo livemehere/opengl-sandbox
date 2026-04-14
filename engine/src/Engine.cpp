@@ -61,6 +61,7 @@ void Engine::Run() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     shader.Bind();
+    shader.SetVec4("uColor", 1.0f, 0.3f, 0.3f, 1.0f);
     mesh.Bind();
     mesh.Draw();
 

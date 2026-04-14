@@ -10,6 +10,9 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
   std::ifstream vertexFile;
   std::ifstream fragmentFile;
 
+  vertexFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+  fragmentFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
   try {
     vertexFile.open(vertexPath);
     fragmentFile.open(fragmentPath);
@@ -25,7 +28,7 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     fragmentFile.close();
 
   } catch (std::ifstream::failure &e) {
-    spdlog::error("Shader file not successfully read: {}", e.what());
+    spdlog::error("Shader file fail to read: {}", e.what());
     return;
   }
 

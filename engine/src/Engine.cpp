@@ -42,16 +42,22 @@ bool Engine::Init(int width, int height, const char *title) {
 void Engine::Run() {
   spdlog::info("Starting main loop");
 
-  Shader shader("shaders/basic.vs", "shaders/basic.fs");
+  Shader shader("../../../shaders/basic.vs", "../../../shaders/basic.fs");
+  // Mesh mesh;
 
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    shader.Bind();
+    // mesh.Bind();
     glfwSwapBuffers(window);
 
     glfwPollEvents();
   }
+
+  shader.UnBind();
+  // mesh.UnBind();
 }
 
 void Engine::ShutDown() {

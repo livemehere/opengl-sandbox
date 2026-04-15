@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 Texture::Texture(const char *path) {
+  stbi_set_flip_vertically_on_load(true);
   unsigned char *data = stbi_load(path, &width, &height, &channels, 0);
   if (!data) {
     spdlog::error("Failed to load texture: {}", path);

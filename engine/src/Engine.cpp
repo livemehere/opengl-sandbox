@@ -2,6 +2,7 @@
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
+#include <glm/gtc/matrix_transform.hpp>
 #include <spdlog/spdlog.h>
 
 Engine::Engine() = default;
@@ -60,6 +61,8 @@ void Engine::Run() {
   // clang-format on
   Texture texture("../../../assets/texture.jpg");
 
+  glm::mat4 model = glm::mat4(1.0f);
+
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -67,10 +70,14 @@ void Engine::Run() {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // move
+    model = glm::translate(model, glm::vec3(0.01f, 0.0f, 0.0f));
+
     shader.Bind();
     texture.Bind();
     shader.SetBool("uUseTexture", true);
     shader.SetInt("uTexture", 0);
+    shader.SetMat4("uModel", model);
 
     mesh.Bind();
     mesh.Draw();

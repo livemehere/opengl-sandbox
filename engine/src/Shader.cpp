@@ -1,6 +1,7 @@
 #include "Shader.hpp"
 #include "Debug.hpp"
 #include <fstream>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include <string>
@@ -114,5 +115,13 @@ void Shader::SetInt(const std::string &name, int value) const {
     spdlog::warn("Uniform '{}' not found in shader program {}", name, ID);
   } else {
     GLCALL(glUniform1i(location, value));
+  }
+}
+void Shader::SetMat4(const std::string &name, const glm::mat4 &model) const {
+  int location = glGetUniformLocation(ID, name.c_str());
+  if (location == -1) {
+    spdlog::warn("Uniform '{}' not found in shader program {}", name, ID);
+  } else {
+    GLCALL(glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(model)));
   }
 }

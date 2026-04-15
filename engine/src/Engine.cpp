@@ -1,6 +1,7 @@
 #include "Engine.hpp"
 #include "Mesh.hpp"
 #include "Shader.hpp"
+#include "Texture.hpp"
 #include <spdlog/spdlog.h>
 
 Engine::Engine() = default;
@@ -44,24 +45,33 @@ void Engine::Run() {
   spdlog::info("Starting main loop");
 
   Shader shader("../../../shaders/basic.vs", "../../../shaders/basic.fs");
+  // clang-format off
   Mesh mesh(
       {
-          -0.5f, 0.5f, 0.0f, // top-left
-          0.5f, 0.5f, 0.0f,  // top-right
-          0.5f, -0.5f, 0.0f, // bottom-right
-          -0.5f, -0.5f, 0.0f // bottom-left
+          {{-0.5f, 0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.5f}, {0.0f, 1.0f}}, // top-left
+          {{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 0.5f}, {1.0f, 1.0f}},  // top-right
+          {{0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 1.0f, 0.5f}, {1.0f, 0.0f}}, // bottom-right
+          {{-0.5f, -0.5f, 0.0f}, {0.5f, 0.5f, 0.5f, 0.5f}, {0.0f, 0.0f}}  // bottom-left
       },
       {
           0, 1, 2, // first triangle
           2, 3, 0  // second triangle
       });
+  // clang-format on
+  Texture texture("../../../assets/texture.jpg");
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     shader.Bind();
-    shader.SetVec4("uColor", 1.0f, 0.3f, 0.3f, 1.0f);
+    texture.Bind();
+    shader.SetBool("uUseTexture", true);
+    shader.SetInt("uTexture", 0);
+
     mesh.Bind();
     mesh.Draw();
 

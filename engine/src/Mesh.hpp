@@ -1,6 +1,14 @@
 #pragma once
 
+#include <glad/glad.h>
+#include <glm/glm.hpp>
 #include <vector>
+
+struct Vertex {
+  glm::vec3 Position;
+  glm::vec4 Color;
+  glm::vec2 TexCoords;
+};
 
 class Mesh {
 private:
@@ -8,9 +16,9 @@ private:
 
 public:
   std::vector<unsigned int> indices;
-  std::vector<float> vertices;
+  std::vector<Vertex> vertices;
 
-  Mesh(std::vector<float> vertices, std::vector<unsigned int> indices);
+  Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
   ~Mesh();
 
   Mesh(const Mesh &) = delete;

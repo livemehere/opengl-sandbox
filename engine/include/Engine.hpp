@@ -9,6 +9,8 @@
 class Engine {
 private:
   GLFWwindow *window = nullptr;
+  int width;
+  int height;
   void LogHardwareInfo();
   static void ErrorCallback(int error, const char *desc) {
     fprintf(stderr, "GLFW Error %d: %s\n", error, desc);

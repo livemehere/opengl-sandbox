@@ -10,6 +10,9 @@ Engine::Engine() = default;
 Engine::~Engine() = default;
 
 bool Engine::Init(int width, int height, const char *title) {
+  this->width = width;
+  this->height = height;
+
   if (!glfwInit()) {
     spdlog::error("Failed to initialize GLFW");
     return false;
@@ -50,10 +53,10 @@ void Engine::Run() {
   // clang-format off
   Mesh mesh(
       {
-          {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}, // top-left
-          {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},  // top-right
-          {{0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}, // bottom-right
-          {{-0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}  // bottom-left
+          {{0.0f, 256.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}, // top-left
+          {{256.0f, 256.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},  // top-right
+          {{256.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}, // bottom-right
+          {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}  // bottom-left
       },
       {
           0, 1, 2, // first triangle
@@ -65,7 +68,12 @@ void Engine::Run() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width), 0.0f,
+                              static_cast<float>(height), -1.0f, 1.0f);
+
+  glm::vec3 position =
+      glm::vec3(static_cast<float>(width) / 2.0f - 128.0f,
+                static_cast<float>(height) / 2.0f - 128.0f, 0.0f);
   glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
   float rotation = 0.0f;
 
@@ -75,13 +83,13 @@ void Engine::Run() {
 
     // move
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-      position.x -= 0.01f;
+      position.x -= 1.0f;
     } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-      position.x += 0.01f;
+      position.x += 1.0f;
     } else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      position.y += 0.01f;
+      position.y += 1.0f;
     } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      position.y -= 0.01f;
+      position.y -= 1.0f;
     }
 
     // rotate
@@ -93,11 +101,11 @@ void Engine::Run() {
 
     // scale
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
-      scale.x += 0.01f;
-      scale.y += 0.01f;
+      scale.x += 0.1f;
+      scale.y += 0.1f;
     } else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-      scale.x -= 0.01f;
-      scale.y -= 0.01f;
+      scale.x -= 0.1f;
+      scale.y -= 0.1f;
     }
 
     glm::mat4 model = glm::mat4(1.0f);
@@ -110,6 +118,7 @@ void Engine::Run() {
     texture.Bind();
     shader.SetBool("uUseTexture", true);
     shader.SetInt("uTexture", 0);
+    shader.SetMat4("uProj", proj);
     shader.SetMat4("uModel", model);
 
     mesh.Bind();

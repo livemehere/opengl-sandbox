@@ -67,20 +67,28 @@ void Engine::Run() {
 
   glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
   glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
+  float rotation = 0.0f;
 
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // move
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
       position.x -= 0.01f;
-    } else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+    } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
       position.x += 0.01f;
-    } else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+    } else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
       position.y += 0.01f;
-    } else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
       position.y -= 0.01f;
+    }
+
+    // rotate
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+      rotation += 1.0f;
+    } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+      rotation -= 1.0f;
     }
 
     // scale
@@ -94,6 +102,8 @@ void Engine::Run() {
 
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
+    model =
+        glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
     model = glm::scale(model, scale);
 
     shader.Bind();

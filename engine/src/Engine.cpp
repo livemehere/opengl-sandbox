@@ -2,6 +2,7 @@
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
+#include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <spdlog/spdlog.h>
 
@@ -61,17 +62,39 @@ void Engine::Run() {
   // clang-format on
   Texture texture("../../../assets/texture.jpg");
 
-  glm::mat4 model = glm::mat4(1.0f);
-
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // move
-    model = glm::translate(model, glm::vec3(0.01f, 0.0f, 0.0f));
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+      position.x -= 0.01f;
+    } else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+      position.x += 0.01f;
+    } else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+      position.y += 0.01f;
+    } else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+      position.y -= 0.01f;
+    }
+
+    // scale
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+      scale.x += 0.01f;
+      scale.y += 0.01f;
+    } else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+      scale.x -= 0.01f;
+      scale.y -= 0.01f;
+    }
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, position);
+    model = glm::scale(model, scale);
 
     shader.Bind();
     texture.Bind();

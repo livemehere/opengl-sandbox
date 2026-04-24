@@ -53,10 +53,10 @@ void Engine::Run() {
   // clang-format off
   Mesh mesh(
       {
-          {{0.0f, 256.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}, // top-left
-          {{256.0f, 256.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},  // top-right
-          {{256.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}, // bottom-right
-          {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}  // bottom-left
+          {{-128.0f, -128.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}, // top-left
+          {{128.0f, -128.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},  // top-right
+          {{128.0f, 128.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}, // bottom-right
+          {{-128.0f, 128.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}  // bottom-left
       },
       {
           0, 1, 2, // first triangle
@@ -68,12 +68,11 @@ void Engine::Run() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width), 0.0f,
-                              static_cast<float>(height), -1.0f, 1.0f);
+  glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width),
+                              static_cast<float>(height), 0.0f, -1.0f, 1.0f);
 
-  glm::vec3 position =
-      glm::vec3(static_cast<float>(width) / 2.0f - 128.0f,
-                static_cast<float>(height) / 2.0f - 128.0f, 0.0f);
+  glm::vec3 position = glm::vec3(static_cast<float>(width) / 2.0f,
+                                 static_cast<float>(height) / 2.0f, 0.0f);
   glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
   float rotation = 0.0f;
 
@@ -87,16 +86,16 @@ void Engine::Run() {
     } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
       position.x += 1.0f;
     } else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      position.y += 1.0f;
-    } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
       position.y -= 1.0f;
+    } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+      position.y += 1.0f;
     }
 
     // rotate
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-      rotation += 1.0f;
-    } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
       rotation -= 1.0f;
+    } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+      rotation += 1.0f;
     }
 
     // scale

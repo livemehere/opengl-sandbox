@@ -9,9 +9,16 @@
 Engine::Engine() = default;
 Engine::~Engine() = default;
 
-bool Engine::Init(int width, int height, const char *title) {
+void Engine::SetSize(int width, int height) {
   this->width = width;
   this->height = height;
+  if (window) {
+    glfwSetWindowSize(window, width, height);
+  }
+}
+
+bool Engine::Init(int width, int height, const char *title) {
+  SetSize(width, height);
 
   if (!glfwInit()) {
     spdlog::error("Failed to initialize GLFW");
@@ -33,6 +40,7 @@ bool Engine::Init(int width, int height, const char *title) {
     return false;
   }
 
+  glfwSetWindowUserPointer(window, this);
   glfwMakeContextCurrent(window);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -40,8 +48,12 @@ bool Engine::Init(int width, int height, const char *title) {
     return false;
   }
 
-  LogHardwareInfo();
+  // Set Viewport and Framebuffer Size Callback
+  glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 
+  glViewport(0, 0, fbWidth, fbHeight);
+
+  LogHardwareInfo();
   spdlog::info("Engine initialized successfully");
   return true;
 }
@@ -68,15 +80,17 @@ void Engine::Run() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width),
-                              static_cast<float>(height), 0.0f, -1.0f, 1.0f);
-
   glm::vec3 position = glm::vec3(static_cast<float>(width) / 2.0f,
                                  static_cast<float>(height) / 2.0f, 0.0f);
   glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
   float rotation = 0.0f;
 
   while (!glfwWindowShouldClose(window)) {
+    // logical size
+    glfwGetWindowSize(window, &width, &height);
+    // physical size
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -107,11 +121,18 @@ void Engine::Run() {
       scale.y -= 0.1f;
     }
 
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+      SetSize(width += 10, height += 10);
+    }
+
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
     model =
         glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
     model = glm::scale(model, scale);
+
+    glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width),
+                                static_cast<float>(height), 0.0f, -1.0f, 1.0f);
 
     shader.Bind();
     texture.Bind();

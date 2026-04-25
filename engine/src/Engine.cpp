@@ -6,6 +6,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <spdlog/spdlog.h>
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 Engine::Engine() = default;
 Engine::~Engine() = default;
 
@@ -55,10 +59,21 @@ bool Engine::Init(int width, int height, const char *title) {
 
   LogHardwareInfo();
   spdlog::info("Engine initialized successfully");
+
+  // IMGUI Setup
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGui::StyleColorsDark();
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplOpenGL3_Init("#version 330");
+
   return true;
 }
 
 void Engine::Run() {
+
+  ImGuiIO &io = ImGui::GetIO();
+
   spdlog::info("Starting main loop");
 
   Shader shader("../../../shaders/basic.vs", "../../../shaders/basic.fs");
@@ -93,6 +108,21 @@ void Engine::Run() {
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("Controls");
+    ImGui::Text("FPS : %.0f", io.Framerate);
+    // move
+    ImGui::Text("Move");
+    ImGui::SliderFloat("Position X", &position.x, 0.0f,
+                       static_cast<float>(width));
+    ImGui::SliderFloat("Position Y", &position.y, 0.0f,
+                       static_cast<float>(height));
+
+    ImGui::End();
 
     // move
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
@@ -143,6 +173,9 @@ void Engine::Run() {
 
     mesh.Bind();
     mesh.Draw();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);
     glfwPollEvents();

@@ -14,7 +14,8 @@ target_include_directories(engine PUBLIC include)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
-target_link_libraries(engine PUBLIC glfw spdlog::spdlog OpenGL::GL)
+find_package(imgui CONFIG REQUIRED)
+target_link_libraries(engine PUBLIC glfw spdlog::spdlog OpenGL::GL imgui::imgui)
 
 message("engine end ===============================")
 

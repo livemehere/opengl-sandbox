@@ -99,13 +99,12 @@ void Engine::Run() {
   glEnable(GL_DEPTH_TEST);
 
   // camera
-  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 400.0f);
   float cameraZoom = 1.0f;
 
-  glm::vec3 position = glm::vec3(static_cast<float>(width) / 2.0f,
-                                 static_cast<float>(height) / 2.0f, 0.0f);
+  glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
   glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
-  float rotation = 0.0f;
+  glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
   while (!glfwWindowShouldClose(window)) {
     // logical size
@@ -128,6 +127,14 @@ void Engine::Run() {
                        static_cast<float>(width));
     ImGui::SliderFloat("Position Y", &position.y, 0.0f,
                        static_cast<float>(height));
+    ImGui::SliderFloat("Position Z", &position.z, -100.0f, 100.0f);
+
+    ImGui::Separator();
+
+    ImGui::Text("Rotate");
+    ImGui::SliderFloat("Rotation X", &rotation.x, -180.0f, 180.0f);
+    ImGui::SliderFloat("Rotation Y", &rotation.y, -180.0f, 180.0f);
+    ImGui::SliderFloat("Rotation Z", &rotation.z, -180.0f, 180.0f);
 
     ImGui::End();
 
@@ -140,13 +147,6 @@ void Engine::Run() {
       cameraPos.y -= 1.0f;
     } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
       cameraPos.y += 1.0f;
-    }
-
-    // rotate
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-      rotation -= 1.0f;
-    } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-      rotation += 1.0f;
     }
 
     // scale
@@ -162,9 +162,19 @@ void Engine::Run() {
 
     // model
     glm::mat4 model = glm::mat4(1.0f);
+
+    // translation
     model = glm::translate(model, position);
-    model =
-        glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    // rotation
+    model = glm::rotate(model, glm::radians(rotation.x),
+                        glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(rotation.y),
+                        glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(rotation.z),
+                        glm::vec3(0.0f, 0.0f, 1.0f));
+
+    // scale
     model = glm::scale(model, scale);
 
     // view
@@ -173,8 +183,9 @@ void Engine::Run() {
     view = glm::translate(view, -cameraPos);
 
     // projection
-    glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width), 0.0f,
-                                static_cast<float>(height), -1.0f, 1.0f);
+    glm::mat4 proj = glm::perspective(
+        glm::radians(45.0f),
+        static_cast<float>(width) / static_cast<float>(height), 0.1f, 1000.0f);
 
     shader.Bind();
     texture.Bind();

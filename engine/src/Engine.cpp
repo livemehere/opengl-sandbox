@@ -1,4 +1,6 @@
 #include "Engine.hpp"
+#include "Camera.hpp"
+#include "Entity.hpp"
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
@@ -11,6 +13,7 @@
 #include <imgui_impl_opengl3.h>
 
 #include "Transform.hpp"
+#include <vector>
 
 Engine::Engine() = default;
 Engine::~Engine() = default;
@@ -78,63 +81,28 @@ void Engine::Run() {
 
   spdlog::info("Starting main loop");
 
+  Camera camera;
+  camera.transform.position.z = 5.0f;
+
   Shader shader("../../../shaders/basic.vs", "../../../shaders/basic.fs");
-  // clang-format off
-  Mesh mesh(
-    {
-        // Front face (z = 0.5)
-        {{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}, // 0
-        {{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}, // 1
-        {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}, // 2
-        {{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}, // 3
-        // Back face (z = -0.5)
-        {{ 0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}, // 4
-        {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}, // 5
-        {{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}, // 6
-        {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}, // 7
-        // Left face (x = -0.5)
-        {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}, // 8
-        {{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}, // 9
-        {{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}, // 10
-        {{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}, // 11
-        // Right face (x = 0.5)
-        {{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}, // 12
-        {{ 0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}, // 13
-        {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}, // 14
-        {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}, // 15
-        // Top face (y = 0.5)
-        {{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}, // 16
-        {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}, // 17
-        {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}, // 18
-        {{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}, // 19
-        // Bottom face (y = -0.5)
-        {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}, // 20
-        {{ 0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}, // 21
-        {{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}, // 22
-        {{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}  // 23
-    },
-    {
-        0, 1, 2, 2, 3, 0,       // Front
-        4, 5, 6, 6, 7, 4,       // Back
-        8, 9, 10, 10, 11, 8,    // Left
-        12, 13, 14, 14, 15, 12, // Right
-        16, 17, 18, 18, 19, 16, // Top
-        20, 21, 22, 22, 23, 20  // Bottom
-    });
-  // clang-format on
+
+  std::vector<Entity> entities;
+
+  Mesh mesh = Mesh::CreateCube();
   Texture texture("../../../assets/texture.jpg");
+
+  for (int i = 0; i < 5; i++) {
+    Entity box(&mesh, &texture);
+    box.transform.position = glm::vec3(i * 1.5f - 3.0f, 0.0f, 0.0f);
+    entities.push_back(box);
+  }
+  auto &box = entities[0];
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // z-order
   glEnable(GL_DEPTH_TEST);
-
-  // camera
-  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 10.0f);
-  float cameraZoom = 1.0f;
-
-  Transform transform;
 
   while (!glfwWindowShouldClose(window)) {
     // logical size
@@ -153,76 +121,40 @@ void Engine::Run() {
     ImGui::Text("FPS : %.0f", io.Framerate);
     // move
     ImGui::Text("Move");
-    ImGui::SliderFloat("Position X", &transform.position.x, 0.0f,
+    ImGui::SliderFloat("Position X", &box.transform.position.x, 0.0f,
                        static_cast<float>(width));
-    ImGui::SliderFloat("Position Y", &transform.position.y, 0.0f,
+    ImGui::SliderFloat("Position Y", &box.transform.position.y, 0.0f,
                        static_cast<float>(height));
-    ImGui::SliderFloat("Position Z", &transform.position.z, -100.0f, 100.0f);
+    ImGui::SliderFloat("Position Z", &box.transform.position.z, -100.0f,
+                       100.0f);
 
     ImGui::Separator();
 
     ImGui::Text("Rotate");
-    ImGui::SliderFloat("Rotation X", &transform.rotation.x, -180.0f, 180.0f);
-    ImGui::SliderFloat("Rotation Y", &transform.rotation.y, -180.0f, 180.0f);
-    ImGui::SliderFloat("Rotation Z", &transform.rotation.z, -180.0f, 180.0f);
+    ImGui::SliderFloat("Rotation X", &box.transform.rotation.x, -180.0f,
+                       180.0f);
+    ImGui::SliderFloat("Rotation Y", &box.transform.rotation.y, -180.0f,
+                       180.0f);
+    ImGui::SliderFloat("Rotation Z", &box.transform.rotation.z, -180.0f,
+                       180.0f);
 
     ImGui::End();
 
-    transform.rotation.x += 0.25f;
-    transform.rotation.y += 0.25f;
-
-    // move
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-      cameraPos.x -= 0.1f;
-    } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-      cameraPos.x += 0.1f;
-    } else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      cameraPos.z -= 0.1f;
-    } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      cameraPos.z += 0.1f;
-    } else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-      cameraPos.y += 0.1f;
-    } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-      cameraPos.y -= 0.1f;
-    }
-
-    // scale
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
-      cameraZoom += 0.1f;
-    } else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-      cameraZoom -= 0.1f;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-      SetSize(width += 10, height += 10);
-    }
-
-    // model
-    auto model = transform.GetModelMatrix();
-
-    // view
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::scale(view, glm::vec3(cameraZoom, cameraZoom, 1.0f));
-    view = glm::translate(view, -cameraPos);
-
-    // projection
+    glm::mat4 view = camera.GetViewMatrix();
     glm::mat4 proj = glm::perspective(
         glm::radians(45.0f),
         static_cast<float>(width) / static_cast<float>(height), 0.1f, 1000.0f);
 
-    shader.Bind();
-    texture.Bind();
-    shader.SetBool("uUseTexture", true);
-    shader.SetInt("uTexture", 0);
-    shader.SetMat4("uModel", model);
-    shader.SetMat4("uView", view);
-    shader.SetMat4("uProj", proj);
-
-    mesh.Bind();
-    mesh.Draw();
+    for (auto &entity : entities) {
+      entity.Draw(view, proj, shader);
+      entity.transform.rotation.x += 0.25f;
+      entity.transform.rotation.y += 0.25f;
+    }
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    camera.Controls(window);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

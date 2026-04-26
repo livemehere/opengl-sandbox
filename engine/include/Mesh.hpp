@@ -27,4 +27,6 @@ public:
   void Bind() const;
   void UnBind() const;
   void Draw() const;
+
+  static Mesh CreateCube();
 };

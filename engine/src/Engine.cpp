@@ -10,6 +10,8 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+#include "Transform.hpp"
+
 Engine::Engine() = default;
 Engine::~Engine() = default;
 
@@ -132,9 +134,7 @@ void Engine::Run() {
   glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 10.0f);
   float cameraZoom = 1.0f;
 
-  glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-  glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
-  glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+  Transform transform;
 
   while (!glfwWindowShouldClose(window)) {
     // logical size
@@ -153,23 +153,23 @@ void Engine::Run() {
     ImGui::Text("FPS : %.0f", io.Framerate);
     // move
     ImGui::Text("Move");
-    ImGui::SliderFloat("Position X", &position.x, 0.0f,
+    ImGui::SliderFloat("Position X", &transform.position.x, 0.0f,
                        static_cast<float>(width));
-    ImGui::SliderFloat("Position Y", &position.y, 0.0f,
+    ImGui::SliderFloat("Position Y", &transform.position.y, 0.0f,
                        static_cast<float>(height));
-    ImGui::SliderFloat("Position Z", &position.z, -100.0f, 100.0f);
+    ImGui::SliderFloat("Position Z", &transform.position.z, -100.0f, 100.0f);
 
     ImGui::Separator();
 
     ImGui::Text("Rotate");
-    ImGui::SliderFloat("Rotation X", &rotation.x, -180.0f, 180.0f);
-    ImGui::SliderFloat("Rotation Y", &rotation.y, -180.0f, 180.0f);
-    ImGui::SliderFloat("Rotation Z", &rotation.z, -180.0f, 180.0f);
+    ImGui::SliderFloat("Rotation X", &transform.rotation.x, -180.0f, 180.0f);
+    ImGui::SliderFloat("Rotation Y", &transform.rotation.y, -180.0f, 180.0f);
+    ImGui::SliderFloat("Rotation Z", &transform.rotation.z, -180.0f, 180.0f);
 
     ImGui::End();
 
-    rotation.x += 0.25f;
-    rotation.y += 0.25f;
+    transform.rotation.x += 0.25f;
+    transform.rotation.y += 0.25f;
 
     // move
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
@@ -198,21 +198,7 @@ void Engine::Run() {
     }
 
     // model
-    glm::mat4 model = glm::mat4(1.0f);
-
-    // translation
-    model = glm::translate(model, position);
-
-    // rotation
-    model = glm::rotate(model, glm::radians(rotation.x),
-                        glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(rotation.y),
-                        glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(rotation.z),
-                        glm::vec3(0.0f, 0.0f, 1.0f));
-
-    // scale
-    model = glm::scale(model, scale);
+    auto model = transform.GetModelMatrix();
 
     // view
     glm::mat4 view = glm::mat4(1.0f);

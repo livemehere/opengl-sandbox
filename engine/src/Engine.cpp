@@ -95,6 +95,13 @@ void Engine::Run() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  // z-order
+  glEnable(GL_DEPTH_TEST);
+
+  // camera
+  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
+  float cameraZoom = 1.0f;
+
   glm::vec3 position = glm::vec3(static_cast<float>(width) / 2.0f,
                                  static_cast<float>(height) / 2.0f, 0.0f);
   glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -107,7 +114,7 @@ void Engine::Run() {
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -126,13 +133,13 @@ void Engine::Run() {
 
     // move
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-      position.x -= 1.0f;
+      cameraPos.x -= 1.0f;
     } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-      position.x += 1.0f;
+      cameraPos.x += 1.0f;
     } else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      position.y -= 1.0f;
+      cameraPos.y -= 1.0f;
     } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      position.y += 1.0f;
+      cameraPos.y += 1.0f;
     }
 
     // rotate
@@ -155,12 +162,19 @@ void Engine::Run() {
       SetSize(width += 10, height += 10);
     }
 
+    // model
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
     model =
         glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
     model = glm::scale(model, scale);
 
+    // view
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::scale(view, glm::vec3(cameraZoom, cameraZoom, 1.0f));
+    view = glm::translate(view, -cameraPos);
+
+    // projection
     glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width),
                                 static_cast<float>(height), 0.0f, -1.0f, 1.0f);
 
@@ -168,8 +182,9 @@ void Engine::Run() {
     texture.Bind();
     shader.SetBool("uUseTexture", true);
     shader.SetInt("uTexture", 0);
-    shader.SetMat4("uProj", proj);
     shader.SetMat4("uModel", model);
+    shader.SetMat4("uView", view);
+    shader.SetMat4("uProj", proj);
 
     mesh.Bind();
     mesh.Draw();

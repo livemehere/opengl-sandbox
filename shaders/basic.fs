@@ -8,11 +8,13 @@ in vec2 vTexCoords;
 uniform sampler2D uTexture;
 uniform bool uUseTexture;
 
+uniform vec4 uLightColor;
+
 void main()
 {
   if(uUseTexture){
-    FragColor = texture(uTexture, vTexCoords) * vColor;
+    FragColor = texture(uTexture, vTexCoords) * vColor * uLightColor;
   }else{
-    FragColor = vColor;
+    FragColor = vColor * uLightColor;
   }
 }

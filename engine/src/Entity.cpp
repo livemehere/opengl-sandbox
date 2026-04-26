@@ -11,6 +11,8 @@ void Entity::Draw(const glm::mat4 &view, const glm::mat4 &proj,
 
   shader.Bind();
 
+  shader.SetVec4("uLightColor", 1.0f, 1.0f, 1.0f, 1.0f);
+
   if (texture) {
     texture->Bind();
     shader.SetBool("uUseTexture", true);

@@ -80,10 +80,10 @@ void Engine::Run() {
   // clang-format off
   Mesh mesh(
       {
-          {{-128.0f, -128.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}, // top-left
-          {{128.0f, -128.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},  // top-right
-          {{128.0f, 128.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}, // bottom-right
-          {{-128.0f, 128.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}  // bottom-left
+          {{-128.0f, 128.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}, // top-left
+          {{128.0f, 128.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},  // top-right
+          {{128.0f, -128.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}, // bottom-right
+          {{-128.0f,-128.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}  // bottom-left
       },
       {
           0, 1, 2, // first triangle
@@ -173,8 +173,8 @@ void Engine::Run() {
     view = glm::translate(view, -cameraPos);
 
     // projection
-    glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width),
-                                static_cast<float>(height), 0.0f, -1.0f, 1.0f);
+    glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width), 0.0f,
+                                static_cast<float>(height), -1.0f, 1.0f);
 
     shader.Bind();
     texture.Bind();

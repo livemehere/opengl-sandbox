@@ -76,13 +76,14 @@ bool Engine::Init(int width, int height, const char *title) {
 }
 
 void Engine::Run() {
+  spdlog::info("Starting main loop");
 
   ImGuiIO &io = ImGui::GetIO();
 
-  spdlog::info("Starting main loop");
-
   Camera camera;
-  camera.transform.position.z = 5.0f;
+  camera.transform.position.z = 8.0f;
+  camera.transform.position.y = 2.0f;
+  camera.target = glm::vec3(0.0f, 0.0f, 0.0f);
 
   Shader shader("../../../shaders/basic.vs", "../../../shaders/basic.fs");
 
@@ -140,6 +141,7 @@ void Engine::Run() {
 
     ImGui::End();
 
+    camera.Update();
     glm::mat4 view = camera.GetViewMatrix();
     glm::mat4 proj = glm::perspective(
         glm::radians(45.0f),

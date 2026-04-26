@@ -151,11 +151,9 @@ void Engine::Run() {
 
     // scale
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
-      scale.x += 0.1f;
-      scale.y += 0.1f;
+      cameraZoom += 0.1f;
     } else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-      scale.x -= 0.1f;
-      scale.y -= 0.1f;
+      cameraZoom -= 0.1f;
     }
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {

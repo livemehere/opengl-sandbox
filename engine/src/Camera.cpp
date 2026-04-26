@@ -1,6 +1,7 @@
 #include "Camera.hpp"
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <spdlog/spdlog.h>
 
 void Camera::Controls(GLFWwindow *window) {
   // Movement
@@ -41,6 +42,40 @@ void Camera::Controls(GLFWwindow *window) {
   }
   if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
     yaw += 1.0f;
+  }
+
+  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    double mouseX, mouseY;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+    spdlog::info("Mouse Position: ({}, {})", mouseX, mouseY);
+    if (firstClick) {
+      lastMouseX = static_cast<float>(mouseX);
+      lastMouseY = static_cast<float>(mouseY);
+      firstClick = false;
+    }
+
+    float xOffset = static_cast<float>(mouseX) - lastMouseX;
+    float yOffset = lastMouseY - static_cast<float>(mouseY); // reversed since
+
+    lastMouseX = static_cast<float>(mouseX);
+    lastMouseY = static_cast<float>(mouseY);
+
+    xOffset *= mouseSensitivity;
+    yOffset *= mouseSensitivity;
+
+    yaw += xOffset;
+    pitch += yOffset;
+
+    if (pitch > 89.0f)
+      pitch = 89.0f;
+    if (pitch < -89.0f)
+      pitch = -89.0f;
+
+  } else {
+    firstClick = true;
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
   }
 }
 

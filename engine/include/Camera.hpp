@@ -12,6 +12,12 @@ private:
   glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
   glm::vec3 right = glm::normalize(glm::cross(front, up));
 
+  // mouse
+  bool firstClick = true;
+  float lastMouseX = 0.0f;
+  float lastMouseY = 0.0f;
+  float mouseSensitivity = 0.1f;
+
 public:
   glm::mat4 view;
   glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);

@@ -142,6 +142,8 @@ void Engine::Run() {
     ImGui::End();
 
     camera.Update();
+    camera.Controls(window);
+
     glm::mat4 view = camera.GetViewMatrix();
     glm::mat4 proj = glm::perspective(
         glm::radians(45.0f),
@@ -155,8 +157,6 @@ void Engine::Run() {
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    camera.Controls(window);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

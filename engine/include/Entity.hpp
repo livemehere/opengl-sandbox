@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mesh.hpp"
+#include "MeshRenderer.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
 #include "Transform.hpp"
@@ -8,13 +9,10 @@
 class Entity {
 public:
   Transform transform;
-  Mesh *mesh = nullptr;
-  Texture *texture = nullptr;
+  MeshRenderer *meshRenderer = nullptr;
 
-  Entity(Mesh *mesh, Texture *texture);
-  Entity(Mesh *mesh);
+  Entity(MeshRenderer *meshRenderer) : meshRenderer(meshRenderer) {};
   ~Entity() = default;
 
-  void Draw(const glm::mat4 &view, const glm::mat4 &proj,
-            const Shader &shader) const;
+  void Draw(const glm::mat4 &view, const glm::mat4 &proj) const;
 };

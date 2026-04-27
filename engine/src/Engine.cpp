@@ -85,15 +85,18 @@ void Engine::Run() {
   camera.transform.position.y = 2.0f;
   camera.target = glm::vec3(0.0f, 0.0f, 0.0f);
 
-  Shader shader("../../../shaders/basic.vs", "../../../shaders/basic.fs");
-
   std::vector<Entity> entities;
 
   Mesh mesh = Mesh::CreateCube();
+
+  Shader shader("../../../shaders/basic.vs", "../../../shaders/basic.fs");
   Texture texture("../../../assets/texture.jpg");
+  Material material(&shader, &texture);
+
+  MeshRenderer meshRenderer(&mesh, &material);
 
   for (int i = 0; i < 5; i++) {
-    Entity box(&mesh, &texture);
+    Entity box(&meshRenderer);
     box.transform.position = glm::vec3(i * 1.5f - 3.0f, 0.0f, 0.0f);
     entities.push_back(box);
   }
@@ -150,7 +153,7 @@ void Engine::Run() {
         static_cast<float>(width) / static_cast<float>(height), 0.1f, 1000.0f);
 
     for (auto &entity : entities) {
-      entity.Draw(view, proj, shader);
+      entity.Draw(view, proj);
       entity.transform.rotation.x += 0.25f;
       entity.transform.rotation.y += 0.25f;
     }

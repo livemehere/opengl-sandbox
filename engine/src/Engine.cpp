@@ -190,6 +190,8 @@ void Engine::Run() {
   shader.UnBind();
   texture.UnBind();
   geometry.UnBind();
+
+  smallCubeGeometry.UnBind();
 }
 
 void Engine::ShutDown() {

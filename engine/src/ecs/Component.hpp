@@ -10,5 +10,5 @@ protected:
 
 public:
   virtual ~Component() = default;
-  virtual void Update(float deltaTime) = 0;
+  virtual void Update(float deltaTime) {};
 };

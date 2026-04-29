@@ -1,6 +1,7 @@
 #include "Engine.hpp"
 #include "Camera/Camera.hpp"
 #include "ecs/Entity.hpp"
+#include "ecs/components/Light.hpp"
 #include "ecs/components/Mesh.hpp"
 #include "ecs/components/Movement.hpp"
 #include "resources/Geometry.hpp"
@@ -111,12 +112,18 @@ void Engine::Run() {
   auto light = std::make_unique<Entity>();
   Geometry smallCubeGeometry = Geometry::CreateCube(0.2f, 0.2f, 0.2f);
   Material lightMaterial(&shader);
+  lightMaterial.unlit = true;
   light->AddComponent<Mesh>(&smallCubeGeometry, &lightMaterial);
-  auto transform = light->GetComponent<Transform>();
-  transform->position = glm::vec3(0.0f, 3.0f, 0.0f);
+  auto lightTransform = light->GetComponent<Transform>();
+  lightTransform->position = glm::vec3(0.0f, 3.0f, 0.0f);
+  auto lightComponent = light->AddComponent<Light>();
+  lightComponent->color = glm::vec3(1.0f);
+  lightComponent->ambientStrength = 0.2f;
+  lightComponent->diffuseStrength = 1.0f;
+  lightComponent->specularStrength = 0.8f;
+  lightComponent->shininess = 32.0f;
   entities.push_back(std::move(light));
 
-  //
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -171,6 +178,23 @@ void Engine::Run() {
         static_cast<float>(width) / static_cast<float>(height), 0.1f, 1000.0f);
 
     Mesh::SetRenderMatrices(view, proj);
+    Mesh::SetCameraPosition(camera.transform.position);
+
+    Light *activeLight = nullptr;
+    Transform *activeLightTransform = nullptr;
+    for (auto &entity : entities) {
+      activeLight = entity->GetComponent<Light>();
+      if (activeLight) {
+        activeLightTransform = entity->GetComponent<Transform>();
+        break;
+      }
+    }
+
+    if (activeLight && activeLightTransform) {
+      Mesh::SetLight(activeLightTransform->position, activeLight);
+    } else {
+      Mesh::SetLight(glm::vec3(0.0f, 3.0f, 0.0f), nullptr);
+    }
 
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;

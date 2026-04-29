@@ -13,6 +13,7 @@ public:
 
   Shader *shader = nullptr;
   Texture *texture = nullptr;
+  bool unlit = false;
 
   void Bind(const glm::mat4 &model, const glm::mat4 &view,
             const glm::mat4 &proj) const;

@@ -6,9 +6,7 @@ void Material::Bind(const glm::mat4 &model, const glm::mat4 &view,
   shader->SetMat4("uModel", model);
   shader->SetMat4("uView", view);
   shader->SetMat4("uProj", proj);
-
-  // TODO: : inject outside
-  shader->SetVec4("uLightColor", 1.0f, 1.0f, 1.0f, 1.0f);
+  shader->SetBool("uUnlit", unlit);
 
   if (texture) {
     texture->Bind();

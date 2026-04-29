@@ -18,6 +18,7 @@ find_package(glfw3 REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(imgui CONFIG REQUIRED)
-target_link_libraries(engine PUBLIC glfw spdlog::spdlog OpenGL::GL imgui::imgui)
+find_package(assimp CONFIG REQUIRED)
+target_link_libraries(engine PUBLIC glfw spdlog::spdlog OpenGL::GL imgui::imgui assimp::assimp)
 
 message("engine end ===============================")

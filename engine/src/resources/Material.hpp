@@ -7,6 +7,8 @@ class Material {
 public:
   Material(Shader *shader, Texture *texture)
       : shader(shader), texture(texture) {};
+  Material(Shader *shader) : shader(shader) {};
+
   ~Material() = default;
 
   Shader *shader = nullptr;

@@ -1,5 +1,5 @@
+#include "../Debug.hpp"
 #include "Shader.hpp"
-#include "Debug.hpp"
 #include <fstream>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>

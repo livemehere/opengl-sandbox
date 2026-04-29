@@ -10,7 +10,7 @@ struct Vertex {
   glm::vec2 TexCoords;
 };
 
-class Mesh {
+class Geometry {
 private:
   unsigned int VAO, VBO, EBO;
 
@@ -18,15 +18,15 @@ public:
   std::vector<unsigned int> indices;
   std::vector<Vertex> vertices;
 
-  Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
-  ~Mesh();
+  Geometry(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
+  ~Geometry();
 
-  Mesh(const Mesh &) = delete;
-  Mesh &operator=(const Mesh &) = delete;
+  Geometry(const Geometry &) = delete;
+  Geometry &operator=(const Geometry &) = delete;
 
   void Bind() const;
   void UnBind() const;
-  void Draw() const;
+  void Render() const;
 
-  static Mesh CreateCube();
+  static Geometry CreateCube();
 };

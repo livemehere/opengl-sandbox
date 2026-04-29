@@ -1,9 +1,14 @@
 #include "Engine.hpp"
-#include "Camera.hpp"
-#include "Entity.hpp"
-#include "Mesh.hpp"
-#include "Shader.hpp"
-#include "Texture.hpp"
+#include "Camera/Camera.hpp"
+#include "ecs/Entity.hpp"
+#include "ecs/components/Mesh.hpp"
+#include "ecs/components/Movement.hpp"
+#include "resources/Geometry.hpp"
+#include "resources/Material.hpp"
+#include "resources/Shader.hpp"
+#include "resources/Texture.hpp"
+
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <spdlog/spdlog.h>
@@ -12,7 +17,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include "Transform.hpp"
+#include <memory>
 #include <vector>
 
 Engine::Engine() = default;
@@ -80,33 +85,36 @@ void Engine::Run() {
 
   ImGuiIO &io = ImGui::GetIO();
 
+  std::vector<std::unique_ptr<Entity>> entities;
+
   Camera camera;
   camera.transform.position.z = 8.0f;
   camera.transform.position.y = 2.0f;
-  camera.target = glm::vec3(0.0f, 0.0f, 0.0f);
 
-  std::vector<Entity> entities;
-
-  Mesh mesh = Mesh::CreateCube();
+  Geometry cubeGeometry = Geometry::CreateCube();
 
   Shader shader("../../../shaders/basic.vs", "../../../shaders/basic.fs");
   Texture texture("../../../assets/texture.jpg");
   Material material(&shader, &texture);
 
-  MeshRenderer meshRenderer(&mesh, &material);
-
   for (int i = 0; i < 5; i++) {
-    Entity box(&meshRenderer);
-    box.transform.position = glm::vec3(i * 1.5f - 3.0f, 0.0f, 0.0f);
-    entities.push_back(box);
+    auto entity = std::make_unique<Entity>();
+    auto transform = entity->GetComponent<Transform>();
+    transform->position = glm::vec3(i * 1.5f - 3.0f, 0.0f, 0.0f);
+    entity->AddComponent<Mesh>(&cubeGeometry, &material);
+    entity->AddComponent<Movement>();
+    entities.push_back(std::move(entity));
   }
-  auto &box = entities[0];
+  auto selectedTransform = entities[0]->GetComponent<Transform>();
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // z-order
   glEnable(GL_DEPTH_TEST);
+
+  float lastFrame = 0.0f;
+  float deltaTime = 0.0f;
 
   while (!glfwWindowShouldClose(window)) {
     // logical size
@@ -125,21 +133,21 @@ void Engine::Run() {
     ImGui::Text("FPS : %.0f", io.Framerate);
     // move
     ImGui::Text("Move");
-    ImGui::SliderFloat("Position X", &box.transform.position.x, 0.0f,
+    ImGui::SliderFloat("Position X", &selectedTransform->position.x, 0.0f,
                        static_cast<float>(width));
-    ImGui::SliderFloat("Position Y", &box.transform.position.y, 0.0f,
+    ImGui::SliderFloat("Position Y", &selectedTransform->position.y, 0.0f,
                        static_cast<float>(height));
-    ImGui::SliderFloat("Position Z", &box.transform.position.z, -100.0f,
+    ImGui::SliderFloat("Position Z", &selectedTransform->position.z, -100.0f,
                        100.0f);
 
     ImGui::Separator();
 
     ImGui::Text("Rotate");
-    ImGui::SliderFloat("Rotation X", &box.transform.rotation.x, -180.0f,
+    ImGui::SliderFloat("Rotation X", &selectedTransform->rotation.x, -180.0f,
                        180.0f);
-    ImGui::SliderFloat("Rotation Y", &box.transform.rotation.y, -180.0f,
+    ImGui::SliderFloat("Rotation Y", &selectedTransform->rotation.y, -180.0f,
                        180.0f);
-    ImGui::SliderFloat("Rotation Z", &box.transform.rotation.z, -180.0f,
+    ImGui::SliderFloat("Rotation Z", &selectedTransform->rotation.z, -180.0f,
                        180.0f);
 
     ImGui::End();
@@ -152,10 +160,14 @@ void Engine::Run() {
         glm::radians(45.0f),
         static_cast<float>(width) / static_cast<float>(height), 0.1f, 1000.0f);
 
+    Mesh::SetRenderMatrices(view, proj);
+
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+
     for (auto &entity : entities) {
-      entity.Draw(view, proj);
-      entity.transform.rotation.x += 0.25f;
-      entity.transform.rotation.y += 0.25f;
+      entity->Update(deltaTime);
     }
 
     ImGui::Render();
@@ -166,7 +178,7 @@ void Engine::Run() {
   }
 
   shader.UnBind();
-  mesh.UnBind();
+  cubeGeometry.UnBind();
 }
 
 void Engine::ShutDown() {

@@ -1,5 +1,5 @@
+#include "../Debug.hpp"
 #include "Texture.hpp"
-#include "Engine.hpp"
 #include "stb_image.h"
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>

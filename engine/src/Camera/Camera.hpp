@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Transform.hpp"
+#include "../ecs/components/Transform.hpp"
+
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 class Camera {
@@ -20,11 +22,13 @@ private:
 
 public:
   glm::mat4 view;
-  glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
   Transform transform;
 
   Camera() = default;
   ~Camera() = default;
+
+  Camera(const Camera &) = delete;
+  Camera &operator=(const Camera &) = delete;
 
   void Update();
   void Controls(GLFWwindow *window);

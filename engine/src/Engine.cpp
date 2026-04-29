@@ -91,22 +91,32 @@ void Engine::Run() {
   camera.transform.position.z = 8.0f;
   camera.transform.position.y = 2.0f;
 
-  Geometry cubeGeometry = Geometry::CreateCube();
-
   Shader shader("../../../shaders/basic.vs", "../../../shaders/basic.fs");
   Texture texture("../../../assets/texture.jpg");
-  Material material(&shader, &texture);
+  Geometry geometry = Geometry::CreateCube(1.0f, 1.0f, 1.0f);
 
+  // cubes
+  Material material(&shader, &texture);
   for (int i = 0; i < 5; i++) {
     auto entity = std::make_unique<Entity>();
     auto transform = entity->GetComponent<Transform>();
     transform->position = glm::vec3(i * 1.5f - 3.0f, 0.0f, 0.0f);
-    entity->AddComponent<Mesh>(&cubeGeometry, &material);
+    entity->AddComponent<Mesh>(&geometry, &material);
     entity->AddComponent<Movement>();
     entities.push_back(std::move(entity));
   }
   auto selectedTransform = entities[0]->GetComponent<Transform>();
 
+  // light
+  auto light = std::make_unique<Entity>();
+  Geometry smallCubeGeometry = Geometry::CreateCube(0.2f, 0.2f, 0.2f);
+  Material lightMaterial(&shader);
+  light->AddComponent<Mesh>(&smallCubeGeometry, &lightMaterial);
+  auto transform = light->GetComponent<Transform>();
+  transform->position = glm::vec3(0.0f, 3.0f, 0.0f);
+  entities.push_back(std::move(light));
+
+  //
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -178,7 +188,8 @@ void Engine::Run() {
   }
 
   shader.UnBind();
-  cubeGeometry.UnBind();
+  texture.UnBind();
+  geometry.UnBind();
 }
 
 void Engine::ShutDown() {

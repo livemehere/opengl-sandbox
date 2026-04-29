@@ -28,5 +28,5 @@ public:
   void UnBind() const;
   void Render() const;
 
-  static Geometry CreateCube();
+  static Geometry CreateCube(float x = 1.0f, float y = 1.0f, float z = 1.0f);
 };

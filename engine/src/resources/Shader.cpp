@@ -30,7 +30,7 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     fragmentFile.close();
 
   } catch (std::ifstream::failure &e) {
-    spdlog::error("Shader file fail to read: {}", e.what());
+    spdlog::error("Failed to read shader file: {}", e.what());
     return;
   }
 
